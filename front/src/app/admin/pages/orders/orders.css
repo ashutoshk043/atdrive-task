@@ -1,0 +1,27 @@
+/* src/features/orders/orders.css                          */
+/* Tailwind v4 handles almost everything.                  */
+/* This file holds only things Tailwind utilities can't do */
+
+/* ── Custom scrollbar inside the modal ────────────────── */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
+}
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 99px;
+}
+
+/* ── Backdrop blur fallback for older Safari ──────────── */
+@supports not (backdrop-filter: blur(4px)) {
+  .backdrop-blur-sm {
+    background-color: rgba(0, 0, 0, 0.65);
+  }
+}
+
+/* ── Smooth tap highlight removal on mobile ───────────── */
+button {
+  -webkit-tap-highlight-color: transparent;
+}

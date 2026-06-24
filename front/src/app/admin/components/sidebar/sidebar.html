@@ -1,0 +1,95 @@
+<!-- Backdrop, mobile/tablet only, shown when drawer is open -->
+<div
+  *ngIf="sidebarSvc.isOpen()"
+  class="fixed inset-0 z-30 bg-black/30 lg:hidden"
+  (click)="sidebarSvc.close()"
+></div>
+
+<aside
+  class="fixed inset-y-0 left-0 top-0 bottom-0 z-40 flex h-screen w-60 flex-col bg-white border-r border-[#e5e5e0]
+         transform transition-transform duration-300 ease-in-out
+         lg:static lg:h-full lg:translate-x-0"
+  [class.-translate-x-full]="!sidebarSvc.isOpen()"
+>
+  <div class="flex items-center justify-between gap-2 px-6 py-6">
+    <div class="flex items-center gap-2.5">
+      <span class="text-[#f0a857] text-base leading-none">◆</span>
+      <span class="font-archivo font-bold text-[13px] tracking-[0.16em] text-[#1f2230]">AtDrive</span>
+    </div>
+    <button
+      type="button"
+      class="lg:hidden text-[#6b7088] hover:text-[#1f2230] p-1 rounded"
+      (click)="sidebarSvc.close()"
+      aria-label="Close menu"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-5 w-5">
+        <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="relative flex-1 flex flex-col gap-0.5 px-3 py-2 overflow-y-auto">
+    <span
+      class="absolute left-0 w-[3px] rounded-r-[3px] bg-[#f0a857] transition-all duration-300 ease-in-out"
+      [style.top.px]="markerTop"
+      [style.height.px]="markerHeight"
+    ></span>
+
+<a
+  *ngFor="let item of navItems"
+  #navLink
+  routerLinkActive="router-link-active"
+  #rla="routerLinkActive"
+  [routerLink]="item.route"
+  (click)="onNavClick()"
+  class="relative flex items-center gap-3 ml-[3px] px-3 py-2.5 rounded-lg
+         font-archivo font-semibold text-[13.5px] tracking-wide
+         transition-colors duration-150 hover:bg-[#f7f7f5]"
+  [ngClass]="rla.isActive
+    ? 'text-[#1f2230] bg-[#f0a857]/[0.12]'
+    : 'text-[#6b7088] hover:text-[#1f2230]'"
+>
+  <span
+    class="inline-flex h-[18px] w-[18px] flex-shrink-0"
+    [ngClass]="rla.isActive ? 'text-[#c97f2e]' : ''"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-full w-full">
+      <ng-container [ngSwitch]="item.icon">
+        <path *ngSwitchCase="'home'"
+          d="M3 11.5 12 4l9 7.5M5.5 10v9a1 1 0 0 0 1 1H10v-5.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V20h3.5a1 1 0 0 0 1-1v-9"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+
+        <ng-container *ngSwitchCase="'users'">
+          <circle cx="9" cy="8" r="3.2"/>
+          <path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke-linecap="round"/>
+          <circle cx="17" cy="9" r="2.4"/>
+          <path d="M15.2 13.3c2.4.2 4.3 1.9 4.3 4.4" stroke-linecap="round"/>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'products'">
+          <path d="M12 3.5 20 8v8l-8 4.5L4 16V8l8-4.5Z" stroke-linejoin="round"/>
+          <path d="M4 8l8 4.5L20 8M12 12.5V21" stroke-linejoin="round"/>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'orders'">
+  <path d="M12 3.5 20 8v8l-8 4.5L4 16V8l8-4.5Z" stroke-linejoin="round"/>
+  <path d="M4 8l8 4.5L20 8M12 12.5V21" stroke-linejoin="round"/>
+</ng-container>
+
+      </ng-container>
+    </svg>
+  </span>
+
+  <span class="truncate">
+    {{ item.label }}
+  </span>
+</a>
+  </nav>
+
+  <div class="flex items-center gap-2 px-6 py-5 border-t border-[#e5e5e0]">
+    <span class="h-1.5 w-1.5 rounded-full bg-[#3fa66b] shadow-[0_0_0_3px_rgba(63,166,107,0.15)]"></span>
+    <span class="font-mono text-[11.5px] text-[#9a9fb0]">All systems normal</span>
+  </div>
+</aside>

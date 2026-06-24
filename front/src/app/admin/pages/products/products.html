@@ -1,0 +1,233 @@
+<div class="p-4 sm:p-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+    <div>
+      <h1 class="text-xl font-semibold text-gray-900">Products</h1>
+      <p class="text-sm text-gray-500">{{ products.length }} total</p>
+    </div>
+    <button
+      type="button"
+      (click)="openAddModal()"
+      class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+    >
+      <span>+ Add Product</span>
+    </button>
+  </div>
+
+  <!-- Error banner -->
+  @if (errorMessage) {
+    <div class="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Loading state -->
+  @if (loading) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      @for (skeleton of [1, 2, 3, 4]; track skeleton) {
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden animate-pulse">
+          <div class="h-36 bg-gray-100"></div>
+          <div class="p-4 space-y-2">
+            <div class="h-4 bg-gray-100 rounded w-3/4"></div>
+            <div class="h-3 bg-gray-100 rounded w-full"></div>
+            <div class="h-3 bg-gray-100 rounded w-1/2"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (products.length) {
+    <!-- Card grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      @for (product of products; track product._id) {
+        <div
+          class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col hover:shadow-md transition-shadow"
+        >
+          <!-- Placeholder image area -->
+          <div class="h-36 bg-gray-100 flex items-center justify-center">
+            <svg class="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 18h18M3 6h18M3 6v12M21 6v12" />
+            </svg>
+          </div>
+
+          <div class="p-4 flex flex-col flex-1">
+            <h2 class="text-sm font-semibold text-gray-900 truncate" [title]="product.name">
+              {{ product.name }}
+            </h2>
+            <p class="mt-1 text-sm text-gray-500 line-clamp-2">
+              {{ product.description }}
+            </p>
+
+            <div class="mt-3 flex items-center justify-between">
+              <span class="text-base font-semibold text-gray-900">
+                {{ formatPrice(product.price) }}
+              </span>
+              <span class="text-xs text-gray-400">
+                Updated {{ formatDate(product.updatedAt) }}
+              </span>
+            </div>
+
+            <div class="mt-4 flex gap-3 text-sm font-medium border-t border-gray-100 pt-3">
+              <button type="button" (click)="openEditModal(product)" class="text-indigo-600 hover:text-indigo-800">
+                Edit
+              </button>
+              <button type="button" (click)="confirmDelete(product)" class="text-red-600 hover:text-red-800">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="bg-white rounded-xl border border-gray-200 p-10 text-center text-sm text-gray-500">
+      No products found.
+    </div>
+  }
+</div>
+
+<!-- Add / Edit modal -->
+@if (isModalOpen) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" (click)="closeModal()">
+    <div
+      class="bg-white rounded-xl shadow-xl w-full max-w-md p-6"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-900">
+          {{ isEditMode ? 'Edit Product' : 'Add Product' }}
+        </h2>
+        <button type="button" (click)="closeModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      @if (formError) {
+        <div class="mb-4 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
+          {{ formError }}
+        </div>
+      }
+
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <!-- Name -->
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            placeholder="e.g. iPhone 15"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            [class.border-red-400]="name?.invalid && name?.touched"
+          />
+          @if (name?.invalid && name?.touched) {
+            <p class="mt-1 text-xs text-red-600">
+              @if (name?.errors?.['required']) {
+                Name is required.
+              } @else if (name?.errors?.['minlength']) {
+                Name must be at least 2 characters.
+              }
+            </p>
+          }
+        </div>
+
+        <!-- Price -->
+        <div>
+          <label for="price" class="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+          <input
+            id="price"
+            type="number"
+            formControlName="price"
+            placeholder="e.g. 79999"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            [class.border-red-400]="price?.invalid && price?.touched"
+          />
+          @if (price?.invalid && price?.touched) {
+            <p class="mt-1 text-xs text-red-600">
+              @if (price?.errors?.['required']) {
+                Price is required.
+              } @else if (price?.errors?.['min']) {
+                Price must be greater than 0.
+              }
+            </p>
+          }
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            rows="3"
+            placeholder="Short product description"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            [class.border-red-400]="description?.invalid && description?.touched"
+          ></textarea>
+          @if (description?.invalid && description?.touched) {
+            <p class="mt-1 text-xs text-red-600">
+              @if (description?.errors?.['required']) {
+                Description is required.
+              } @else if (description?.errors?.['minlength']) {
+                Description must be at least 10 characters.
+              }
+            </p>
+          }
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-end gap-3 pt-2">
+          <button
+            type="button"
+            (click)="closeModal()"
+            [disabled]="isSubmitting"
+            class="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            [disabled]="isSubmitting"
+            class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+          >
+            {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Add Product') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Delete confirm dialog -->
+@if (deletingProduct) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" (click)="cancelDelete()">
+    <div
+      class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 class="text-lg font-semibold text-gray-900">Delete product?</h2>
+      <p class="mt-2 text-sm text-gray-500">
+        This will permanently remove <span class="font-medium text-gray-700">{{ deletingProduct.name }}</span>. This action cannot be undone.
+      </p>
+      <div class="mt-5 flex justify-end gap-3">
+        <button
+          type="button"
+          (click)="cancelDelete()"
+          [disabled]="isDeleting"
+          class="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          (click)="deleteProduct()"
+          [disabled]="isDeleting"
+          class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+        >
+          {{ isDeleting ? 'Deleting...' : 'Delete' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

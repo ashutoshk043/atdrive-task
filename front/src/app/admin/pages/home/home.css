@@ -1,0 +1,224 @@
+/* ─── Root: full viewport width ─────────────────────────── */
+.weather-root {
+  width: 100%;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+/* ─── Card: full width, no max-width constraint ──────────── */
+.weather-card {
+  width: 100%;
+  border: 0.5px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+/* ─── Header band ────────────────────────────────────────── */
+.header-band {
+  background: linear-gradient(135deg, #E6F1FB 0%, #EAF3DE 100%);
+  padding: 1.5rem 2rem;
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.location-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.location-name {
+  font-size: 20px;
+  font-weight: 500;
+  color: #0C447C;
+}
+
+.location-country {
+  font-size: 13px;
+  color: #185FA5;
+  margin-bottom: 12px;
+}
+
+.temp-block {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.condition-icon {
+  border-radius: 8px;
+}
+
+.temp-big {
+  font-size: 60px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -3px;
+  color: #0C447C;
+}
+
+.feels-like {
+  font-size: 13px;
+  color: #185FA5;
+  margin-top: 4px;
+}
+
+/* ─── Sections ───────────────────────────────────────────── */
+.section {
+  padding: 1.5rem 2rem;
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #888;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ─── Metrics grid: responsive auto columns ──────────────── */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.metric-card {
+  border-radius: 8px;
+  padding: 14px;
+  box-sizing: border-box;
+}
+
+/* Filled variant — used for conditions */
+.metric-card.filled {
+  background: #f5f7fa;
+}
+
+/* Outlined variant — used for air quality */
+.metric-card.outlined {
+  background: transparent;
+  border: 0.5px solid #e0e0e0;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metric-value {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+/* ─── Badges ─────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-blue {
+  background: #E6F1FB;
+  color: #185FA5;
+}
+
+.badge-warn {
+  background: #FAEEDA;
+  color: #854F0B;
+}
+
+/* ─── AQI bar ────────────────────────────────────────────── */
+.aqi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.aqi-bar-bg {
+  background: #eee;
+  border-radius: 999px;
+  height: 7px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.aqi-bar-fill {
+  height: 7px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #639922 0%, #EF9F27 50%, #E24B4A 100%);
+  transition: width 0.5s ease;
+}
+
+.aqi-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #bbb;
+  margin-top: 5px;
+  margin-bottom: 14px;
+}
+
+/* ─── Divider ────────────────────────────────────────────── */
+.divider {
+  border: none;
+  border-top: 0.5px solid #e8e8e8;
+  margin: 0;
+}
+
+/* ─── Footer ─────────────────────────────────────────────── */
+.card-footer {
+  padding: 14px 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.last-updated {
+  font-size: 12px;
+  color: #bbb;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ─── Loading state ──────────────────────────────────────── */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  color: #bbb;
+  font-size: 14px;
+  gap: 10px;
+}
+
+.loading-state i {
+  font-size: 36px;
+}

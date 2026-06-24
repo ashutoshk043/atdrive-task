@@ -1,0 +1,290 @@
+<!-- orders.html -->
+<div class="min-h-screen bg-slate-50 font-sans">
+
+    <!-- ── Top Header ─────────────────────────────────────────────── -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+                <span class="font-semibold text-slate-800 text-lg">Orders</span>
+                <span class="bg-violet-100 text-violet-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                    {{ total }} total
+                </span>
+            </div>
+            <button (click)="openCreate()"
+                class="flex items-center gap-2 bg-violet-600 hover:bg-violet-700 active:scale-95 text-white text-sm font-medium px-4 py-2 rounded-lg transition-all duration-150">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                New Order
+            </button>
+        </div>
+    </header>
+
+    <!-- ── Main Content ───────────────────────────────────────────── -->
+    <main class="max-w-6xl mx-auto px-6 py-8">
+
+        <!-- Loading skeleton -->
+        <div *ngIf="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div *ngFor="let _ of [1,2,3,4,5,6,7,8]"
+                class="bg-white rounded-2xl border border-slate-100 p-5 animate-pulse">
+                <div class="h-4 bg-slate-200 rounded w-3/4 mb-3"></div>
+                <div class="h-3 bg-slate-100 rounded w-1/2 mb-6"></div>
+                <div class="h-3 bg-slate-100 rounded w-full mb-2"></div>
+                <div class="h-3 bg-slate-100 rounded w-2/3"></div>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="!loading && orders.length === 0" class="text-center py-24">
+            <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-violet-50 flex items-center justify-center">
+                <svg class="w-10 h-10 text-violet-300" fill="none" stroke="currentColor" stroke-width="1.5"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+            </div>
+            <p class="text-slate-500 font-medium">No orders yet</p>
+            <p class="text-slate-400 text-sm mt-1">Tap <strong class="font-semibold">New Order</strong> to get started
+            </p>
+        </div>
+
+        <!-- ── Orders Grid ──────────────────────────────────────────── -->
+        <div *ngIf="!loading && orders.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div *ngFor="let order of orders" (click)="openView(order)"
+                class="group bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-lg hover:border-violet-300 transition-all cursor-pointer">
+
+                <!-- Card Header -->
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h3 class="font-semibold text-slate-900 truncate max-w-[180px]">{{ order.customerName }}</h3>
+                        <p class="text-xs text-slate-500 mt-1">#{{ order._id?.slice(-6) }}</p>
+                        <p class="text-xs text-slate-400">{{ order.createdAt | date:'dd MMM yyyy, h:mm a' }}</p>
+                    </div>
+                    <!-- ✅ FIX 1: dynamic status badge using statusStyles map -->
+                    <span class="px-3 py-1 rounded-full text-xs font-medium capitalize"
+                        [ngClass]="statusStyles[order.status || 'pending']">
+                        {{ order.status || 'pending' }}
+                    </span>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="bg-slate-50 rounded-xl p-3">
+                        <p class="text-xs text-slate-500">Qty</p>
+                        <p class="font-semibold text-slate-900">{{ getItemCount(order) }}</p>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-3">
+                        <p class="text-xs text-slate-500">Amount</p>
+                        <p class="font-semibold text-violet-600">₹{{ order.total | number }}</p>
+                    </div>
+                </div>
+
+                <!-- Product list preview -->
+                <div class="space-y-2 mb-4">
+                    <div *ngFor="let item of order.items | slice:0:3" class="flex justify-between text-sm">
+                        <span class="text-slate-600 truncate">
+                            {{ item.name }}
+                            <span *ngIf="item.qty > 1" class="text-slate-400 text-xs ml-1">×{{ item.qty }}</span>
+                        </span>
+                        <span class="font-medium text-slate-800">₹{{ (item.price * item.qty) | number }}</span>
+                    </div>
+                    <div *ngIf="order.items.length > 3" class="text-xs text-violet-600 font-medium">
+                        +{{ order.items.length - 3 }} more products
+                    </div>
+                </div>
+
+                <!-- Card Footer -->
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <div class="flex gap-2">
+                        <button (click)="$event.stopPropagation(); openEdit(order)"
+                            class="w-9 h-9 rounded-xl bg-violet-50 hover:bg-violet-100 flex items-center justify-center">✏️</button>
+                        <button (click)="$event.stopPropagation(); deleteOrder(order._id)"
+                            class="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center">🗑️</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── Pagination ───────────────────────────────────────────── -->
+        <div *ngIf="totalPages > 1" class="flex justify-center items-center gap-2 mt-10">
+            <button (click)="goPage(page - 1)" [disabled]="page === 1"
+                class="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-600 hover:border-violet-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">←</button>
+            <span class="text-sm text-slate-500 px-2">Page {{ page }} of {{ totalPages }}</span>
+            <button (click)="goPage(page + 1)" [disabled]="page === totalPages"
+                class="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-600 hover:border-violet-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">→</button>
+        </div>
+
+    </main>
+</div>
+
+<!-- ══ MODAL BACKDROP ══════════════════════════════════════════════════════ -->
+<div *ngIf="modalMode !== null"
+    class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+    (click)="closeModal()">
+
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col"
+        (click)="$event.stopPropagation()">
+
+        <!-- ── VIEW MODAL ───────────────────────────────────────────── -->
+        <ng-container *ngIf="modalMode === 'view'">
+            <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <!-- ✅ FIX 2: safe navigation ?. operator guards against empty activeOrder -->
+                    <h2 class="text-lg font-semibold text-slate-800">{{ activeOrder?.customerName }}</h2>
+                    <p class="text-slate-400 text-sm">{{ activeOrder?.createdAt | date:'dd MMM yyyy, h:mm a' }}</p>
+                </div>
+                <!-- ✅ FIX 3: safe navigation for status badge in view modal -->
+                <span class="text-sm font-semibold px-3 py-1.5 rounded-full capitalize"
+                    [ngClass]="statusStyles[activeOrder?.status || 'pending']">
+                    {{ activeOrder?.status || 'pending' }}
+                </span>
+            </div>
+
+            <!-- View modal items list -->
+            <div class="p-6 space-y-3">
+                <div *ngFor="let item of activeOrder?.items"
+                    class="flex items-center justify-between py-2 border-b border-slate-50">
+                    <div>
+                        <p class="text-sm font-medium text-slate-700">{{ item.name }}</p>
+                        <p class="text-xs text-slate-400">₹{{ item.price | number }} each</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-slate-500">×{{ item.qty }}</span>
+                        <span class="text-sm font-semibold text-slate-800">₹{{ (item.price * item.qty) | number
+                            }}</span>
+                    </div>
+                </div>
+                <div class="flex justify-between pt-2">
+                    <span class="text-base font-semibold text-slate-700">Total</span>
+                    <span class="text-base font-bold text-violet-600">₹{{ activeOrder?.total | number }}</span>
+                </div>
+            </div>
+
+            <div class="p-6 pt-0 flex gap-3">
+                <button (click)="openEditActive()"
+                    class="flex-1 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium py-2.5 rounded-xl transition-colors">
+                    Edit Order
+                </button>
+                <button (click)="closeModal()"
+                    class="px-5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:border-slate-300 transition-colors">
+                    Close
+                </button>
+            </div>
+        </ng-container>
+
+        <!-- ── CREATE / EDIT MODAL ──────────────────────────────────── -->
+        <ng-container *ngIf="modalMode === 'create' || modalMode === 'edit'">
+
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-slate-800">
+                    {{ modalMode === 'create' ? 'Place New Order' : 'Edit Order' }}
+                </h2>
+                <button (click)="closeModal()"
+                    class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+                    ✕
+                </button>
+            </div>
+
+            <form [formGroup]="orderForm" class="p-6 space-y-6">
+
+                <!-- Customer Name -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Customer Name</label>
+                    <input formControlName="customerName" type="text" placeholder="e.g. Rahul Sharma"
+                        class="w-full border rounded-xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent transition"
+                        [class.border-red-400]="customerName?.invalid && customerName?.touched"
+                        [class.border-slate-200]="!(customerName?.invalid && customerName?.touched)" />
+                    @if (customerName?.invalid && customerName?.touched) {
+                    <p class="mt-1 text-xs text-red-500">
+                        @if (customerName?.errors?.['required']) { Name is required. }
+                        @else if (customerName?.errors?.['minlength']) { Name must be at least 2 characters. }
+                    </p>
+                    }
+                </div>
+
+                <!-- ── TAP-TO-ADD MENU ──────────────────────────────────── -->
+                <div>
+                    <p class="text-sm font-medium text-slate-700 mb-3">Tap to Add Items</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <button *ngFor="let item of menuCatalogue" type="button" (click)="tapAdd(item)"
+                            class="relative flex flex-col items-center gap-2 p-4 rounded-2xl border hover:border-violet-400 hover:bg-violet-50 transition">
+
+                            <!-- Qty badge -->
+                            <span *ngIf="getCartQty(item._id) > 0"
+                                class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-violet-600 text-white text-xs flex items-center justify-center font-semibold">
+                                {{ getCartQty(item._id) }}
+                            </span>
+
+                            <span class="text-4xl">{{ item.icon }}</span>
+                            <span class="text-sm font-semibold text-center">{{ item.name }}</span>
+                            <span class="text-xs text-slate-500 text-center">{{ item.description }}</span>
+                            <span class="font-bold text-violet-600">₹{{ item.price | number }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── CART SUMMARY ──────────────────────────────────────── -->
+                <div *ngIf="cartItems.length > 0" class="bg-slate-50 rounded-2xl p-4 space-y-2">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Your Order</p>
+
+                    <div *ngFor="let item of cartItems" class="flex items-center justify-between">
+                        <span class="text-sm text-slate-700">{{ item.name }}</span>
+                        <div class="flex items-center gap-3">
+
+                            <button type="button" (click)="tapRemove(item._id)"
+                                class="w-6 h-6 rounded-full bg-white border border-slate-200 text-slate-500 hover:border-red-300 hover:text-red-500 flex items-center justify-center text-base leading-none transition-colors">
+                                −
+                            </button>
+
+                            <span class="text-sm font-semibold text-slate-800 w-4 text-center">{{ item.qty }}</span>
+
+                            <button type="button" (click)="tapAdd(item)"
+                                class="w-6 h-6 rounded-full bg-white border border-slate-200 text-slate-500 hover:border-violet-300 hover:text-violet-600 flex items-center justify-center text-base leading-none transition-colors">
+                                +
+                            </button>
+
+                            <span class="text-sm font-medium text-slate-600 min-w-[56px] text-right">
+                                ₹{{ (item.price * item.qty) | number }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Grand Total -->
+                    <div class="flex justify-between items-center pt-3 border-t border-slate-200">
+                        <span class="text-sm font-semibold text-slate-700">Total</span>
+                        <span class="text-base font-bold text-violet-600">₹{{ cartTotal | number }}</span>
+                    </div>
+                </div>
+
+                <!-- ✅ FIX 4: empty cart hint so user knows why button is disabled -->
+                <p *ngIf="cartItems.length === 0" class="text-xs text-slate-400 text-center">
+                    Tap a product above to add it to your order
+                </p>
+
+            </form>
+
+            <!-- Modal Footer -->
+            <div class="p-6 pt-0 flex gap-3">
+                <button type="button" (click)="modalMode === 'create' ? submitCreate() : submitEdit()"
+                    [disabled]="orderForm.invalid || cartItems.length === 0"
+                    class="flex-1 bg-violet-600 hover:bg-violet-700 disabled:bg-violet-300 disabled:cursor-not-allowed text-white text-sm font-semibold py-3 rounded-xl transition-all duration-150 active:scale-[0.98]">
+                    {{ modalMode === 'create' ? 'Place Order' : 'Save Changes' }}
+                </button>
+                <button type="button" (click)="closeModal()"
+                    class="px-5 py-3 rounded-xl border border-slate-200 text-sm text-slate-600 hover:border-slate-300 transition-colors">
+                    Cancel
+                </button>
+            </div>
+
+        </ng-container>
+    </div>
+</div>

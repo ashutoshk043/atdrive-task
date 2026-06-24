@@ -1,0 +1,122 @@
+<div class="page-wrapper">
+  <div class="card-container">
+
+    <!-- Brand -->
+    <div class="brand">
+      <div class="brand-icon">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        </svg>
+      </div>
+      <h1 class="brand-title">Welcome Back</h1>
+      <p class="brand-subtitle">Sign in to your account</p>
+    </div>
+
+    <!-- Card -->
+    <div class="card">
+
+      <!-- Error Alert -->
+      <div class="alert-error" *ngIf="errorMsg()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+        </svg>
+        <span>{{ errorMsg() }}</span>
+      </div>
+
+      <form class="form" [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <!-- Username -->
+        <div class="form-group">
+          <label for="login-username" class="form-label">Username</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M5.121 17.804A8.966 8.966 0 0112 15c2.21 0 4.21.8 5.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </span>
+            <input
+              id="login-username"
+              type="text"
+              placeholder="Enter your username"
+              class="form-input with-icon"
+              formControlName="username"
+              [class.input-error]="username.invalid && username.touched"
+            />
+          </div>
+          <p class="field-error" *ngIf="username.invalid && username.touched">
+            <span *ngIf="username.errors?.['required']">Username is required.</span>
+            <span *ngIf="username.errors?.['minlength']">Username must be at least 3 characters.</span>
+          </p>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <!-- <div class="label-row">
+            <label for="login-password" class="form-label">Password</label>
+            <a href="#" class="forgot-link">Forgot password?</a>
+          </div> -->
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+            </span>
+            <input
+              id="login-password"
+              [type]="showPassword() ? 'text' : 'password'"
+              placeholder="Enter your password"
+              class="form-input with-icon with-toggle"
+              formControlName="password"
+              [class.input-error]="password.invalid && password.touched"
+            />
+            <button
+              type="button"
+              class="toggle-btn"
+              (click)="togglePassword()"
+              [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+            >
+              <svg *ngIf="!showPassword()" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              <svg *ngIf="showPassword()" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 3l18 18M10.58 10.58a2 2 0 102.83 2.83M9.88 5.09A9.77 9.77 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.05 10.05 0 01-1.622 2.945M6.61 6.61A9.97 9.97 0 002.458 12c1.274 4.057 5.064 7 9.542 7a9.96 9.96 0 005.39-1.61"/>
+              </svg>
+            </button>
+          </div>
+          <p class="field-error" *ngIf="password.invalid && password.touched">
+            <span *ngIf="password.errors?.['required']">Password is required.</span>
+            <span *ngIf="password.errors?.['minlength']">Password must be at least 6 characters.</span>
+          </p>
+        </div>
+
+        <!-- Remember me -->
+        <!-- <div class="remember-row">
+          <input id="remember" type="checkbox" class="checkbox" formControlName="remember" />
+          <label for="remember" class="remember-label">Remember me for 30 days</label>
+        </div> -->
+
+        <!-- Submit -->
+        <button type="submit" class="btn-primary" [disabled]="isSubmitting()">
+          {{ isSubmitting() ? 'Signing in…' : 'Sign In' }}
+        </button>
+
+      </form>
+
+      <!-- Divider -->
+      <div class="divider">
+        <span class="divider-text" routerLink="/register">don't have an account?</span>
+      </div>
+
+      <a routerLink="/register" class="btn-outline">Create Account</a>
+    </div>
+
+    <p class="footer-text">© 2025 YourApp. All rights reserved.</p>
+  </div>
+</div>

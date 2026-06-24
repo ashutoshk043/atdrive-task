@@ -1,0 +1,154 @@
+<div *ngIf="weather as w" class="weather-root">
+  <div class="weather-card">
+
+    <!-- ── Header Band ── -->
+    <div class="header-band">
+      <div class="header-inner">
+
+        <div class="location-block">
+          <div class="location-row">
+            <i class="ti ti-map-pin" aria-hidden="true"></i>
+            <span class="location-name">{{ w.location.name }}, {{ w.location.region }}</span>
+          </div>
+          <p class="location-country">{{ w.location.country }}</p>
+          <span class="badge badge-blue">
+            <i class="ti ti-sun" aria-hidden="true"></i>
+            {{ w.current.condition.text }}
+          </span>
+        </div>
+
+        <div class="temp-block">
+          <img
+            [src]="'https:' + w.current.condition.icon"
+            [alt]="w.current.condition.text"
+            width="64" height="64"
+            class="condition-icon"
+          />
+          <div>
+            <p class="temp-big">{{ w.current.temp_c }}°</p>
+            <p class="feels-like">Feels like {{ w.current.feelslike_c }}°C</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Current Conditions Grid ── -->
+    <div class="section">
+      <p class="section-title">
+        <i class="ti ti-dashboard" aria-hidden="true"></i> Current conditions
+      </p>
+      <div class="metrics-grid">
+
+        <div class="metric-card filled">
+          <p class="metric-label"><i class="ti ti-wind" aria-hidden="true"></i> Wind</p>
+          <p class="metric-value">{{ w.current.wind_kph }} km/h · {{ w.current.wind_dir }}</p>
+        </div>
+
+        <div class="metric-card filled">
+          <p class="metric-label"><i class="ti ti-droplet" aria-hidden="true"></i> Humidity</p>
+          <p class="metric-value">{{ w.current.humidity }}%</p>
+        </div>
+
+        <div class="metric-card filled">
+          <p class="metric-label"><i class="ti ti-thermometer" aria-hidden="true"></i> Heat index</p>
+          <p class="metric-value">{{ w.current.heatindex_c }}°C</p>
+        </div>
+
+        <div class="metric-card filled">
+          <p class="metric-label"><i class="ti ti-eye" aria-hidden="true"></i> Visibility</p>
+          <p class="metric-value">{{ w.current.vis_km }} km</p>
+        </div>
+
+        <div class="metric-card filled">
+          <p class="metric-label"><i class="ti ti-cloud" aria-hidden="true"></i> Cloud cover</p>
+          <p class="metric-value">{{ w.current.cloud }}%</p>
+        </div>
+
+        <div class="metric-card filled">
+          <p class="metric-label"><i class="ti ti-gauge" aria-hidden="true"></i> Pressure</p>
+          <p class="metric-value">{{ w.current.pressure_mb }} mb</p>
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- ── Air Quality ── -->
+    <div class="section">
+      <div class="aqi-header">
+        <p class="section-title" style="margin-bottom: 0;">
+          <i class="ti ti-leaf" aria-hidden="true"></i> Air quality
+        </p>
+        <span class="badge badge-warn">
+          <i class="ti ti-alert-circle" aria-hidden="true"></i>
+          AQI {{ w.current.air_quality['us-epa-index'] }} ·
+          {{ getAqiLabel(w.current.air_quality['us-epa-index']) }}
+        </span>
+      </div>
+
+      <!-- Gradient progress bar -->
+      <div class="aqi-bar-bg">
+        <div
+          class="aqi-bar-fill"
+          [style.width]="getAqiPercent(w.current.air_quality['us-epa-index'])"
+        ></div>
+      </div>
+      <div class="aqi-scale">
+        <span>Good</span><span>Moderate</span><span>Unhealthy</span>
+      </div>
+
+      <div class="metrics-grid">
+
+        <div class="metric-card outlined">
+          <p class="metric-label">PM2.5</p>
+          <p class="metric-value">{{ w.current.air_quality.pm2_5 | number:'1.1-1' }} µg/m³</p>
+        </div>
+
+        <div class="metric-card outlined">
+          <p class="metric-label">PM10</p>
+          <p class="metric-value">{{ w.current.air_quality.pm10 | number:'1.1-1' }} µg/m³</p>
+        </div>
+
+        <div class="metric-card outlined">
+          <p class="metric-label">CO</p>
+          <p class="metric-value">{{ w.current.air_quality.co | number:'1.0-0' }} µg/m³</p>
+        </div>
+
+        <div class="metric-card outlined">
+          <p class="metric-label">NO₂</p>
+          <p class="metric-value">{{ w.current.air_quality.no2 | number:'1.1-1' }} µg/m³</p>
+        </div>
+
+        <div class="metric-card outlined">
+          <p class="metric-label">O₃</p>
+          <p class="metric-value">{{ w.current.air_quality.o3 | number:'1.1-1' }} µg/m³</p>
+        </div>
+
+        <div class="metric-card outlined">
+          <p class="metric-label">US EPA Index</p>
+          <p class="metric-value">{{ w.current.air_quality['us-epa-index'] }}</p>
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- ── Footer ── -->
+    <div class="card-footer">
+      <p class="last-updated">
+        <i class="ti ti-clock" aria-hidden="true"></i>
+        Last updated: {{ w.current.last_updated }}
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<!-- Loading / empty state -->
+<div *ngIf="!weather" class="loading-state">
+  <i class="ti ti-cloud-rain" aria-hidden="true"></i>
+  <p>Fetching weather data…</p>
+</div>
