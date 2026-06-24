@@ -16,3 +16,7 @@ coverage
 
 # angular
 .angular
+
+.env
+server/.env
+**/.env
