@@ -214,10 +214,14 @@ submitCreate(): void {
   if (!this.cartItems.length) { alert('Please select at least one product'); return; }
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+console.log(user, "user sisisis")
+
   const products = this.cartItems.map((item: any) => ({
     productId: item._id,
     quantity: item.qty,
   }));
+
 
   this.ordersService.createOrder({
     userId: user.id,

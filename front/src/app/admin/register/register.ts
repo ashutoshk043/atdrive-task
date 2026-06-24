@@ -84,9 +84,9 @@ export class Register {
 
     const { email, password } = this.form.getRawValue();
 
-    // NOTE: adjust this call to match your real Auth service's method
-    // signature — assumed here as register(email, password).
-    this.auth.register({email, password}).subscribe({
+    const username = email
+
+    this.auth.register({username, password}).subscribe({
       next: () => {
         this.isSubmitting.set(false);
         this.router.navigate(['/login']);
